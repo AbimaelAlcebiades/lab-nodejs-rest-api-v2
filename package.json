@@ -1,0 +1,19 @@
+{
+  "name": "lab-nodejs-rest-api-v2",
+  "version": "1.0.0",
+  "description": "Testes do curso de node api v2 da Alura",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AbimaelAlcebiades/lab-nodejs-rest-api-v2.git"
+  },
+  "author": "Abimael Alcebíades",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AbimaelAlcebiades/lab-nodejs-rest-api-v2/issues"
+  },
+  "homepage": "https://github.com/AbimaelAlcebiades/lab-nodejs-rest-api-v2#readme"
+}
