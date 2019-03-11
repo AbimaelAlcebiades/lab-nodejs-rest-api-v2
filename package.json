@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/AbimaelAlcebiades/lab-nodejs-rest-api-v2#readme",
   "dependencies": {
+    "consign": "^0.1.6",
     "express": "^4.16.4"
   },
   "devDependencies": {
