@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-const bd = new sqlite3.Database('data.db');
+const db = new sqlite3.Database('data.db');
 
 const PAGAMENTOS_SCHEMA = `
 CREATE TABLE IF NOT EXISTS pagamentos (
@@ -13,16 +13,16 @@ CREATE TABLE IF NOT EXISTS pagamentos (
 )
 `;
 
-bd.serialize(() => {
-    bd.run("PRAGMA foreign_keys=ON");
-    bd.run(PAGAMENTOS_SCHEMA);
+db.serialize(() => {
+    db.run("PRAGMA foreign_keys=ON");
+    db.run(PAGAMENTOS_SCHEMA);
 });
 
 process.on('SIGINT', () =>
-    bd.close(() => {
+    db.close(() => {
         console.log('BD encerrado!');
         process.exit(0);
     })
 );
 
-module.exports = bd;
+module.exports = db;

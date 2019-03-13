@@ -8,7 +8,10 @@ let app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-consign().include('src\\controllers').into(app);
+consign()
+    .include('src\\controllers')
+    .then('src\\model')
+    .into(app);
 
 module.exports = function () {
     return app;
