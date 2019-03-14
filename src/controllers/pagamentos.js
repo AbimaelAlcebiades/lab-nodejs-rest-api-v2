@@ -22,6 +22,22 @@ module.exports = function (app) {
 
     app.post("/pagamentos/pagamento", function (req, res) {
         let pagamento = req.body;
+        console.log('Validando dados de entrada...');
+
+        pagamento.forma_de_pagamento = '';
+
+        req.assert('forma_de_pagamento', 'Forma de pagamento é obrigatória.').notEmpty();
+        req.assert('valor', 'Valor é obrigatório e deve ser decimal.').notEmpty().isFloat();
+        req.assert('moeda', 'Moeda é obrigatória e deve ter 3 caracteres').notEmpty().len(3,3);
+
+        let errors = req.validationErrors();
+
+        if(errors){
+            console.log("Erros de validação encontrados");
+            res.status(400).send(errors);
+            return;
+        }
+
         console.log('Processando pagamento...');
 
         pagamento.status = "CREATED";

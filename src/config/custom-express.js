@@ -1,12 +1,13 @@
 let express = require('express');
 let consign = require('consign');
 let bodyParser = require('body-parser');
-require('./database');
+let expressValidator = require('express-validator');
 
 let app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(expressValidator());
 
 consign({cwd: "src"})
     .include('models')
