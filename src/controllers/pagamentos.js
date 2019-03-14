@@ -24,8 +24,6 @@ module.exports = function (app) {
         let pagamento = req.body;
         console.log('Validando dados de entrada...');
 
-        pagamento.forma_de_pagamento = '';
-
         req.assert('forma_de_pagamento', 'Forma de pagamento é obrigatória.').notEmpty();
         req.assert('valor', 'Valor é obrigatório e deve ser decimal.').notEmpty().isFloat();
         req.assert('moeda', 'Moeda é obrigatória e deve ter 3 caracteres').notEmpty().len(3,3);
@@ -45,7 +43,9 @@ module.exports = function (app) {
 
         pagamentosDAO.save(req.body)
             .then(function (pagamentoCreated) {
-                res.json(pagamentoCreated);
+                console.log(pagamentoCreated);
+                res.location(`/pagamentos/pagamento/${pagamentoCreated.id}`)
+                res.status(201).json(pagamentoCreated);
             }).catch(function (error) {
                 console.log(error);
             });

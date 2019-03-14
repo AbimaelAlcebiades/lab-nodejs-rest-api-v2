@@ -10,7 +10,7 @@ class PagamentosDAO {
         return new Promise((resolve, reject) => {
             this._db.all(
                 'SELECT * FROM pagamentos',
-                (error, results) => {
+                function (error, results) {
                     if (error) {
                         return reject('Não foi possível listar os livros');
                     }
@@ -34,6 +34,7 @@ class PagamentosDAO {
                         return reject('Não foi possível salvar o pagamento!');
                     }
                     console.log("Pagamento salvo")
+                    pagamento.id = this.lastID;
                     resolve(pagamento);
                 }
             )
