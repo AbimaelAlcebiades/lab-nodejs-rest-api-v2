@@ -1,6 +1,8 @@
+let db = require('../config/database');
+
 class PagamentosDAO {
 
-    constructor(db) {
+    constructor() {
         this._db = db;
     }
 
@@ -26,12 +28,13 @@ class PagamentosDAO {
                 VALUES
                     (?, ?, ?, ?, ?, ?)`,
                 [pagamento.forma_de_pagamento, pagamento.valor, pagamento.moeda, pagamento.status, pagamento.data, pagamento.descricao],
-                (error) => {
+                function(error) {
                     if (error) {
                         console.log(error);
-                        return reject('Não foi possível adicionar o livro!');
+                        return reject('Não foi possível salvar o pagamento!');
                     }
-                    resolve();
+                    console.log("Pagamento salvo")
+                    resolve(pagamento);
                 }
             )
         });
@@ -58,4 +61,6 @@ class PagamentosDAO {
     }
 }
 
-module.exports = PagamentosDAO;
+module.exports = function () {
+    return PagamentosDAO;
+}

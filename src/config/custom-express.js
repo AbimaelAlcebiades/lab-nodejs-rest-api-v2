@@ -8,9 +8,9 @@ let app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-consign()
-    .include('src\\controllers')
-    .then('src\\model')
+consign({cwd: "src"})
+    .include('models')
+    .then('controllers')
     .into(app);
 
 module.exports = function () {
