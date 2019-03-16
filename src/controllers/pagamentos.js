@@ -2,7 +2,7 @@ module.exports = function (app) {
 
     let pagamentosDAO = new app.models.PagamentosDAO();
 
-    app.get('/pagamentos', function (req, res) {
+    app.get('/pagamentos', (req, res) => {
         pagamentosDAO.list()
             .then(function (pagamentos) {
                 res.send(pagamentos);
@@ -20,7 +20,7 @@ module.exports = function (app) {
             });
     });
 
-    app.post("/pagamentos/pagamento", function (req, res) {
+    app.post("/pagamentos/pagamento", (req, res) => {
         let pagamento = req.body;
         console.log('Validando dados de entrada...');
 
