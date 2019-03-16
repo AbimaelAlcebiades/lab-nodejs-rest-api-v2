@@ -49,8 +49,8 @@ module.exports = function (app) {
             });
     });
 
-    app.put('/pagamentos/pagamento/:id', function (req, res) {
-        let pagamento = {};
+    app.put('/pagamentos/pagamento/:id', (req, res) => {
+        
         req.assert('id', 'Id de pagamento deve ser um inteiro.').isInt();
         let errors = req.validationErrors();
         if (errors) {
@@ -58,19 +58,47 @@ module.exports = function (app) {
             res.status(400).send(errors);
             return;
         }
+
+        let pagamento = {};
         pagamento.id = req.params.id;
         pagamento.status = "CONFIRMADO";
 
         pagamentosDAO.update(pagamento)
             .then(function (pagamentoCreated) {
-                console.log(pagamentoCreated);
-                res.location(`/pagamentos/pagamento/${pagamentoCreated.id}`)
-                res.status(201).json(pagamentoCreated);
+                if(pagamentoCreated){
+                    res.status(200).send(pagamentoCreated);
+                }else{
+                    res.status(404).send(`O id ${pagamento.id} não existe`);
+                }
             }).catch(function (error) {
-                console.log(error);
+                res.status(500).send('Error');
+            });
+    });
+
+    app.delete('/pagamentos/pagamento/:id', (req, res) => {
+        req.assert('id', 'Id de pagamento deve ser um inteiro.').isInt();
+        let errors = req.validationErrors();
+        if (errors) {
+            console.log("Erros de validação encontrados");
+            res.status(400).send(errors);
+            return;
+        }
+
+        let pagamento = {};
+        pagamento.id = req.params.id;
+
+        pagamentosDAO.delete(pagamento)
+            .then(function (pagamentoDeleted) {
+                if(pagamentoDeleted){
+                    res.status(200);
+                    res.end();
+                }else{
+                    res.status(404).send(`O id ${pagamento.id} não existe`);
+                }
+            }).catch(function (error) {
+                res.status(500).send('Error');
             });
 
-        res.end('OK');
     });
 
 }
