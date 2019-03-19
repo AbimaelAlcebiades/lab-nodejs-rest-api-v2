@@ -25,6 +25,9 @@
     "express-validator": "^5.3.1",
     "marko": "^4.16.1",
     "mysql": "^2.16.0",
+    "restify": "^8.1.1",
+    "restify-clients": "^2.6.4",
+    "soap": "^0.26.0",
     "sqlite": "^3.0.2",
     "sqlite3": "^4.0.6"
   },
