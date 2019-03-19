@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Listagem de produtos</title>
+
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <h1 class="text-center">Listagem de produtos</h1>
+        <table class="table" id="products">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Moeda</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <for|product| of=data.products>
+                <tr id=`product_${product.id}`>
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${formatCurrency(product.price)}</td>
+                    <td>${product.currency}</td>
+                    <td>
+                        <a href="/products/form/${product.id}">
+                            Comprar
+                        </a>
+                    </td>
+                </tr>
+            </for>
+        </table>
+    </div>
+</body>
+
+</html>

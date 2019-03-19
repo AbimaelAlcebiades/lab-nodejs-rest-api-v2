@@ -1,6 +1,7 @@
 module.exports = function (app) {
 
-    let pagamentosDAO = new app.models.PagamentosDAO();
+    let PagamentosDAO = app.src.models.PagamentosDAO;
+    let pagamentosDAO = new PagamentosDAO();
 
     app.get('/pagamentos', (req, res) => {
         pagamentosDAO.list()
@@ -9,20 +10,30 @@ module.exports = function (app) {
             }).catch(error => res.end(error));
     });
 
-    app.get('/pagamento/:id', function (req, res) {
-        pagamentosDAO.getById(req.params.id)
-            .then(pagamentos => {
-                console.log(pagamentos);
-                res.end('ok');
+    app.get('/pagamento/:id', (req, res) => {
+        let pagamento = {};
+        pagamento.id = req.params.id;
+        pagamentosDAO.getById(pagamento)
+            .then(pagamentResponse => {
+                if (pagamentResponse) {
+                    res.send(pagamentResponse);
+                } else {
+                    res.status(404);
+                    res.send(`Não foi encontrado pagamento com id ${pagamento.id}`);
+                }
             }).catch(error => {
-                console.log(error);
-                res.end('ok');
+                res.send(error);
             });
+    });
+
+    app.get('/pagamentos/form', (req, res) => {
+        res.marko(
+            require('../views/pagamentos/form.marko')
+        );
     });
 
     app.post("/pagamentos/pagamento", (req, res) => {
         let pagamento = req.body;
-        console.log('Validando dados de entrada...');
 
         req.assert('forma_de_pagamento', 'Forma de pagamento é obrigatória.').notEmpty();
         req.assert('valor', 'Valor é obrigatório e deve ser decimal.').notEmpty().isFloat();
@@ -30,27 +41,50 @@ module.exports = function (app) {
 
         let errors = req.validationErrors();
         if (errors) {
-            console.log("Erros de validação encontrados");
             res.status(400).send(errors);
-            return;
         }
 
-        console.log('Processando pagamento...');
-        pagamento.status = "CREATED";
-        pagamento.data = new Date();
-
         pagamentosDAO.save(pagamento)
-            .then(function (pagamentoCreated) {
-                console.log(pagamentoCreated);
+            .then((pagamentoCreated) => {
                 res.location(`/pagamentos/pagamento/${pagamentoCreated.id}`)
                 res.status(201).json(pagamentoCreated);
             }).catch(function (error) {
-                console.log(error);
+                res.status(500).send(error);
             });
+
+
+        /*if (pagamento.forma_de_pagamento.name == 'credit_card') {
+            let creditCard = pagamento.forma_de_pagamento.data;
+
+            let clientCustomersCards = new app.services.CustomersCards();
+            clientCustomersCards.authorize(creditCard, (error, request, response, authorizedCreditCard) => {
+                if (error) {
+                    res.status(400).send(error.body);
+                }
+                pagamento.forma_de_pagamento.data = authorizedCreditCard.dados_do_cartao;
+                res.send(pagamento);
+            });
+
+            return;
+
+            pagamento.data = new Date();
+
+            pagamentosDAO.save(pagamento)
+                .then(function (pagamentoCreated) {
+                    console.log(pagamentoCreated);
+                    res.location(`/pagamentos/pagamento/${pagamentoCreated.id}`)
+                    //res.status(201).json(pagamentoCreated);
+                }).catch(function (error) {
+                    res.status(500).send(error);
+                });
+        } else {
+            res.status(400).send('Forma de pagamentos não implementada');
+        }*/
+
     });
 
     app.put('/pagamentos/pagamento/:id', (req, res) => {
-        
+
         req.assert('id', 'Id de pagamento deve ser um inteiro.').isInt();
         let errors = req.validationErrors();
         if (errors) {
@@ -65,9 +99,9 @@ module.exports = function (app) {
 
         pagamentosDAO.update(pagamento)
             .then(function (pagamentoCreated) {
-                if(pagamentoCreated){
+                if (pagamentoCreated) {
                     res.status(200).send(pagamentoCreated);
-                }else{
+                } else {
                     res.status(404).send(`O id ${pagamento.id} não existe`);
                 }
             }).catch(function (error) {
@@ -89,10 +123,10 @@ module.exports = function (app) {
 
         pagamentosDAO.delete(pagamento)
             .then(function (pagamentoDeleted) {
-                if(pagamentoDeleted){
+                if (pagamentoDeleted) {
                     res.status(200);
                     res.end();
-                }else{
+                } else {
                     res.status(404).send(`O id ${pagamento.id} não existe`);
                 }
             }).catch(function (error) {
