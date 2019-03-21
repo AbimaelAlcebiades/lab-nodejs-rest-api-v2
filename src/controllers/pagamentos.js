@@ -26,7 +26,7 @@ module.exports = function (app) {
             });
     });
 
-    app.get('/pagamentos/form', (req, res) => {
+    app.get('/pagamentos/form/:productId', (req, res) => {
         res.marko(
             require('../views/pagamentos/form.marko')
         );

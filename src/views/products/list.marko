@@ -28,10 +28,10 @@
                 <tr id=`product_${product.id}`>
                     <td>${product.id}</td>
                     <td>${product.name}</td>
-                    <td>${formatCurrency(product.price)}</td>
+                    <td>${product.price}</td>
                     <td>${product.currency}</td>
                     <td>
-                        <a href="/products/form/${product.id}">
+                        <a href=`/pagamentos/form/${product.id}`>
                             Comprar
                         </a>
                     </td>

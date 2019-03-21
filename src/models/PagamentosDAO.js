@@ -1,12 +1,15 @@
 let db = require('../config/database');
 
+const PAYMENT_CREATED = 'CRIADO';
+const PAYMENT_CONFIRMED = 'CONFIRMADO';
+const PAYMENT_CANCELED = 'CANCELADO';
 class PagamentosDAO {
 
     constructor() {
         this._db = db;
     }
 
-    getById(id) {
+    getById(pagamento) {
         return new Promise((resolve, reject) =>
             this._db.get(
                 `SELECT
@@ -15,7 +18,7 @@ class PagamentosDAO {
                     pagamentos
                 WHERE
                     id = ?`,
-                [id],
+                [pagamento.id],
                 (error, results) => {
                     if (error) {
                         return reject('Não foi possivel recuperar o pagamento');
@@ -42,19 +45,33 @@ class PagamentosDAO {
 
     save(pagamento) {
         return new Promise((resolve, reject) => {
+            console.log('Gravando pagamento...\n', pagamento);
+            pagamento.status = PAYMENT_CREATED;
+            pagamento.data = new Date();
             this._db.run(
                 `INSERT INTO
                     pagamentos(forma_de_pagamento, valor, moeda, status, data, descricao)
                 VALUES
                     (:forma_de_pagamento, :valor, :moeda, :status, :data, :descricao)`,
-                [pagamento.forma_de_pagamento, pagamento.valor, pagamento.moeda, pagamento.status, pagamento.data, pagamento.descricao],
+                [pagamento.forma_de_pagamento.name, pagamento.valor, pagamento.moeda, pagamento.status, pagamento.data, pagamento.descricao],
                 function (error) {
                     if (error) {
-                        console.log(error);
-                        return reject('Não foi possível salvar o pagamento!');
+                        reject(`Não foi possível salvar o pagamento. ${error}`);
                     }
-                    console.log("Pagamento salvo")
                     pagamento.id = this.lastID;
+                    pagamento.links = [
+                        {
+                            href: `localhost:3000\pagamentos\pagamento\${pagamento.id}`,
+                            rel: 'confirm',
+                            method: 'PUT'
+                        },
+                        {
+                            href: `localhost:3000\pagamentos\pagamento\${pagamento.id}`,
+                            rel: 'cancel',
+                            method: 'DELETE'
+                        }
+                    ]
+
                     resolve(pagamento);
                 }
             )
@@ -72,20 +89,28 @@ class PagamentosDAO {
 
             let binds = {
                 ":id": pagamento.id,
-                ":status": pagamento.status
+                ":status": PAYMENT_CONFIRMED
             };
-            
+
             let st = this._db.prepare(sql);
 
-            st.run( binds, (error) => {
-                if(error){
+            st.run(binds, (error) => {
+                if (error) {
                     reject(error);
                 }
 
-                if(st.changes == 0){
+                if (st.changes == 0) {
                     pagamento = null
+                } else {
+                    pagamento.links = [
+                        {
+                            href: `localhost:3000\pagamentos\pagamento\${pagamento.id}`,
+                            rel: 'list',
+                            method: 'GET'
+                        }
+                    ]
                 }
-                
+
                 resolve(pagamento);
             });
         });
@@ -94,7 +119,7 @@ class PagamentosDAO {
     delete(pagamento) {
         return new Promise((resolve, reject) => {
             let sql =
-            `DELETE FROM
+                `DELETE FROM
                 pagamentos
             WHERE
                 id = :id`;
@@ -102,18 +127,20 @@ class PagamentosDAO {
             let binds = {
                 ":id": pagamento.id
             };
-            
+
             let st = this._db.prepare(sql);
 
-            st.run( binds, (error) => {
-                if(error){
+            st.run(binds, (error) => {
+                if (error) {
                     reject(error);
                 }
 
-                if(st.changes == 0){
+                if (st.changes == 0) {
                     pagamento = null
+                } else {
+                    pagamento.status = PAYMENT_CANCELED;
                 }
-                
+
                 resolve(pagamento);
             });
         });
